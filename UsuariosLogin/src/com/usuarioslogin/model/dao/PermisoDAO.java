@@ -15,16 +15,17 @@ public class PermisoDAO {
 		this.c = c;
 	}
 
-	public Permiso guardar(Permiso permiso) throws SQLException{
-		
-		if(permiso.getIdPermiso() != -1){
+	public Permiso guardar(Permiso permiso) throws SQLException {
+
+		if (permiso.getIdPermiso() != -1) {
 			return permiso;
 		}
-		
-		try{
+
+		try {
 			c.setAutoCommit(false);
-			PreparedStatement pst = c.prepareStatement("INSERT INTO permiso (nombre, descripcion) VALUES (?,?)");
-			
+			PreparedStatement pst = c
+					.prepareStatement("INSERT INTO permiso (nombre, descripcion) VALUES (?,?)");
+
 			pst.setString(1, permiso.getNombre());
 			pst.setString(2, permiso.getDescripcion());
 			pst.executeUpdate();
@@ -34,12 +35,77 @@ public class PermisoDAO {
 			rs.next();
 			permiso.setIdPermiso(rs.getInt("id"));
 			c.commit();
-		}catch(Exception e){
+		} catch (Exception e) {
 			c.rollback();
 		} finally {
 			c.setAutoCommit(true);
 		}
+
+		return permiso;
+	}
+
+	public boolean modificar(Permiso permiso) throws SQLException {
+		if (permiso.getIdPermiso() == -1) {
+			return false;
+		}
+
+		boolean resultado = false;
+
+		try {
+			c.setAutoCommit(false);
+			PreparedStatement pst = c
+					.prepareStatement("UPDATE  permiso SET nombre=?, descripcion=? "
+							+ "WHERE idPermiso=?");
+			pst.setString(1, permiso.getNombre());
+			pst.setString(2, permiso.getDescripcion());
+			pst.setInt(3, permiso.getIdPermiso());
+			pst.executeUpdate();
+			c.commit();
+			resultado = true;
+		} catch (Exception e) {
+			c.rollback();
+			throw new SQLException(e);
+		}finally{
+			c.setAutoCommit(true);
+		}
+		return resultado;
+	}
+	
+	public Permiso modificarGuardar(Permiso permiso) throws SQLException{
+		if(permiso.getIdPermiso() == -1){
+			return guardar(permiso);
+		}
+		else {
+			modificar(permiso);
+			return permiso;
+		}
 		
-		return null;
+		
+	}
+	
+	public boolean eliminar(Permiso permiso) throws SQLException{
+		if(permiso.getIdPermiso() == -1){
+			return false;
+		}
+		
+		boolean resultado = false;
+		
+		try{
+			c.setAutoCommit(false);
+			PreparedStatement pst = c
+					.prepareStatement("DELETE FROM permiso WHERE idPermiso=?");
+			pst.setInt(1, permiso.getIdPermiso());
+			pst.executeUpdate();
+			c.commit();
+			resultado = true;
+			
+		}catch(Exception e){
+			c.rollback();
+			throw new SQLException();
+		}finally {
+			c.setAutoCommit(true);
+		}
+		
+		return resultado;
 	}
 }
