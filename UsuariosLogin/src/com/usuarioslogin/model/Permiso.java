@@ -58,4 +58,10 @@ public class Permiso {
 		super();
 	}
 	
+	public Permiso(int idPermiso, String nombre, String descripcion){
+		this.idPermiso = idPermiso;
+		this.nombre = nombre;
+		this.descripcion = descripcion;
+	}
+	
 }

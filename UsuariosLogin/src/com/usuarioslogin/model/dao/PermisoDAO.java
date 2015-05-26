@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.usuarioslogin.model.Permiso;
 
@@ -106,6 +108,23 @@ public class PermisoDAO {
 			c.setAutoCommit(true);
 		}
 		
+		return resultado;
+	}
+	
+	public List<Permiso> cargar() throws SQLException {
+		List<Permiso> resultado = new ArrayList<Permiso>();
+		try {
+			PreparedStatement pst = c
+					.prepareStatement("SELECT * FROM permiso");
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				resultado.add( new Permiso(rs.getInt("idPermiso"),
+						rs.getString("nombre"), rs.getString("descripcion")));
+			}
+		} catch (Exception e) {
+			
+			throw new SQLException(e);
+		}
 		return resultado;
 	}
 }
