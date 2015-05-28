@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.usuarioslogin.model.Grupo;
+import com.usuarioslogin.model.Permiso;
 
 public class GrupoDAO {
 
@@ -14,12 +17,12 @@ public class GrupoDAO {
 	public GrupoDAO(Connection c) {
 		this.c = c;
 	}
-	
-	public Grupo guardar(Grupo grupo) throws SQLException  {
+
+	public Grupo guardar(Grupo grupo) throws SQLException {
 		if (grupo.getIdGrupo() != -1)
 			return grupo;
-		
-		try{
+
+		try {
 			c.setAutoCommit(false);
 			PreparedStatement pst = c
 					.prepareStatement("INSERT INTO grupo (nombre, descripcion) VALUES (?,?)");
@@ -32,18 +35,17 @@ public class GrupoDAO {
 			rs.next();
 			grupo.setIdGrupo(rs.getInt("id"));
 			c.commit();
-			
-		}catch(Exception e){
+
+		} catch (Exception e) {
 			c.rollback();
 			throw new SQLException(e);
-		}finally{
+		} finally {
 			c.setAutoCommit(true);
 		}
-		
-		
+
 		return grupo;
 	}
-	
+
 	public boolean modificar(Grupo grupo) throws SQLException {
 		if (grupo.getIdGrupo() == -1)
 			return false;
@@ -67,7 +69,7 @@ public class GrupoDAO {
 		}
 		return resultado;
 	}
-	
+
 	public Grupo modificarGuardar(Grupo grupo) throws SQLException {
 		if (grupo.getIdGrupo() == -1) {
 			return guardar(grupo);
@@ -76,7 +78,7 @@ public class GrupoDAO {
 			return grupo;
 		}
 	}
-	
+
 	public boolean eliminar(Grupo grupo) throws SQLException {
 		if (grupo.getIdGrupo() == -1)
 			return false;
@@ -98,5 +100,71 @@ public class GrupoDAO {
 		}
 		return resultado;
 	}
-	
+
+	public Grupo cargar(int idGrupo) throws SQLException {
+		Grupo resultado = null;
+		try {
+			PreparedStatement pst = c
+					.prepareStatement("SELECT * FROM grupo WHERE idGrupo=?");
+			pst.setInt(1, idGrupo);
+			ResultSet rs = pst.executeQuery();
+			if (rs.next()) {
+				resultado = new Grupo(rs.getInt("idGrupo"),
+						rs.getString("nombre"), rs.getString("descripcion"),
+						listarPermisos(rs.getInt("idGrupo")));
+			}
+		} catch (Exception e) {
+
+			throw new SQLException(e);
+		}
+		return resultado;
+	}
+
+	public List<Grupo> cargar() throws SQLException {
+
+		List<Grupo> resultado = new ArrayList<Grupo>();
+
+		try {
+			PreparedStatement pst = c.prepareStatement("SELECT * FROM grupo");
+			ResultSet rs = pst.executeQuery();
+
+			while (rs.next()) {
+				resultado.add(new Grupo(rs.getInt("idGrupo"),
+						rs.getString("nombre"), rs.getString("descripcion"),
+						listarPermisos(rs.getInt("idGrupo"))));
+			}
+
+		} catch (Exception e) {
+			throw new SQLException(e);
+		}
+
+		return resultado;
+
+	}
+
+	public List<Permiso> listarPermisos(int idGrupo) throws SQLException {
+
+		List<Permiso> resultado = new ArrayList<Permiso>();
+
+		try {
+			PreparedStatement pst = c
+					.prepareStatement("SELECT p.idPermiso,p.nombre,p.descripcion "
+							+ "FROM grupo_x_permiso as gxp, permiso as p "
+							+ "WHERE p.idPermiso=gxp.idPermiso "
+							+ "AND gxp.idGrupo = ?");
+
+			pst.setInt(1, idGrupo);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				resultado.add(new Permiso(rs.getInt("idPermiso"), rs
+						.getString("nombre"), rs.getString("descripcion")));
+			}
+
+		} catch (Exception e) {
+			throw new SQLException(e);
+		}
+
+		return resultado;
+	}
+
 }

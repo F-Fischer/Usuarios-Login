@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 public class Grupo {
 
-	private int idGrupo;
+	private int idGrupo=-1;
 
 	private String nombre;
 	private String descripcion;
@@ -61,6 +61,10 @@ public class Grupo {
 		this.nombre = nombre;
 		this.descripcion = descripcion;
 		this.permisos = null;
+	}
+	
+	public Grupo(){
+		super();
 	}
 	
 	@Override
