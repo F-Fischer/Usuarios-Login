@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 public class Usuario {
 
-	private int idUsuario;
+	private int idUsuario = -1;
 	private String nombre;
 	private String apellido;
 	private String mail;
@@ -18,6 +18,34 @@ public class Usuario {
 	private Date expira;
 	private List<Permiso> permisos;
 	private List<Grupo> grupos;
+	
+	public Usuario(){
+		super();
+	}
+	
+	public Usuario(int idUsuario, String apellido, String nombre, String mail, String nick, String password, Date expira){
+		super();
+		this.idUsuario = idUsuario;
+		this.apellido = apellido;
+		this.nombre = nombre;
+		this.mail = mail;
+		this.nick = nick;
+		this.password = password;
+		this.expira = expira;
+	}
+	
+	public Usuario(int idUsuario, String apellido, String nombre, String mail, String nick, String password, Date expira, List<Grupo> grupos, List<Permiso> permisos){
+		super();
+		this.idUsuario = idUsuario;
+		this.apellido = apellido;
+		this.nombre = nombre;
+		this.mail = mail;
+		this.nick = nick;
+		this.password = password;
+		this.expira = expira;
+		this.grupos = grupos;
+		this.permisos = permisos;
+	}
 
 	public int getIdUsuario() {
 		return idUsuario;
